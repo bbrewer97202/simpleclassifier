@@ -1,5 +1,6 @@
 const AWS = require('aws-sdk');
 const uuidv4 = require('uuid/v4');
+const util = require('./util.js');
 const db = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async event => {
@@ -17,9 +18,11 @@ exports.handler = async event => {
 
   try {
     await db.put(params).promise();
-    return { statusCode: 201 };
+    return util.respondSuccess({
+      ...item,
+    });
   } catch (error) {
     console.log('create error', error);
-    return { statusCode: 500 };
+    return util.respondFailure({});
   }
 };

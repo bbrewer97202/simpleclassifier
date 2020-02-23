@@ -1,4 +1,3 @@
-const path = require('path');
 const cdk = require('@aws-cdk/core');
 const dynamodb = require('@aws-cdk/aws-dynamodb');
 const lambda = require('@aws-cdk/aws-lambda');
@@ -6,6 +5,8 @@ const apigateway = require('@aws-cdk/aws-apigateway');
 
 const DYNAMO_TABLE_NAME = 'ClassifierDefinitions';
 const DYNAMO_PRIMARY_KEY = 'id';
+
+//TODO: change from patch to put
 
 class SimpleClassifierStack extends cdk.Stack {
   constructor(scope, id, props) {
@@ -58,10 +59,10 @@ class SimpleClassifierStack extends cdk.Stack {
       handler: 'createOne.handler',
     });
 
-    const lambdaGetOne = new lambda.Function(this, 'GetOne', {
-      ...baseLambdaOptions,
-      handler: 'getOne.handler',
-    });
+    // const lambdaGetOne = new lambda.Function(this, 'GetOne', {
+    //   ...baseLambdaOptions,
+    //   handler: 'getOne.handler',
+    // });
 
     const lambdaUpdateOne = new lambda.Function(this, 'UpdateOne', {
       ...baseLambdaOptions,
@@ -74,7 +75,7 @@ class SimpleClassifierStack extends cdk.Stack {
     });
 
     dynamoTable.grantReadWriteData(lambdaGetAll);
-    dynamoTable.grantReadWriteData(lambdaGetOne);
+    // dynamoTable.grantReadWriteData(lambdaGetOne);
     dynamoTable.grantReadWriteData(lambdaUpdateOne);
     dynamoTable.grantReadWriteData(lambdaCreateOne);
     dynamoTable.grantReadWriteData(lambdaDeleteOne);
@@ -90,8 +91,8 @@ class SimpleClassifierStack extends cdk.Stack {
     labels.addMethod('POST', createOneIntegration);
 
     const label = labels.addResource('{id}');
-    const getOneIntegration = new apigateway.LambdaIntegration(lambdaGetOne);
-    label.addMethod('GET', getOneIntegration);
+    // const getOneIntegration = new apigateway.LambdaIntegration(lambdaGetOne);
+    // label.addMethod('GET', getOneIntegration);
     const deleteOneIntegration = new apigateway.LambdaIntegration(lambdaDeleteOne);
     label.addMethod('DELETE', deleteOneIntegration);
     const updateOneIntegration = new apigateway.LambdaIntegration(lambdaUpdateOne);

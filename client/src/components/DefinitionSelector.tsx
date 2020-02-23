@@ -1,5 +1,5 @@
 import React from 'react';
-import { LabelDefinition } from './types';
+import { LabelDefinition } from '../types';
 
 type Props = {
   list: LabelDefinition[];

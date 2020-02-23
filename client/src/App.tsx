@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import DefinitionSelector from './DefinitionSelector';
-import DefinitionEditor from './DefinitionEditor';
+import DefinitionSelector from './components/DefinitionSelector';
+import DefinitionEditor from './components/DefinitionEditor';
 import { LabelDefinition } from './types';
 import { NEW_DEFINITION_ID } from './constants';
 import useDefinitionApi from './useDefinitionApi';
@@ -11,9 +11,11 @@ function App() {
     loadAllDefinitions,
     saveDefinition,
     deleteDefinition,
+    createDefinition,
     isLoading, //TODO
     isError, //TODO
     allDefinitions: definitionList,
+    apiAffectedDefinition,
   } = useDefinitionApi();
 
   const getActiveDefinition = (): LabelDefinition | null => {
@@ -34,7 +36,12 @@ function App() {
   };
 
   const onDefinitionSave = async (definition: LabelDefinition) => {
-    await saveDefinition(definition);
+    if (definition.id === NEW_DEFINITION_ID) {
+      delete definition.id;
+      await createDefinition(definition);
+    } else {
+      await saveDefinition(definition);
+    }
     await loadAllDefinitions();
   };
 
@@ -50,6 +57,13 @@ function App() {
   useEffect(() => {
     loadAllDefinitions();
   }, [loadAllDefinitions]);
+
+  //on DB update ensure open/active state of the affected definition
+  useEffect(() => {
+    if (apiAffectedDefinition?.id) {
+      setActiveDefinitionId(apiAffectedDefinition.id);
+    }
+  }, [apiAffectedDefinition]);
 
   const style = isLoading ? { opacity: 0.2 } : {};
 
