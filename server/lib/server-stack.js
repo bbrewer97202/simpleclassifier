@@ -6,8 +6,6 @@ const apigateway = require('@aws-cdk/aws-apigateway');
 const DYNAMO_TABLE_NAME = 'ClassifierDefinitions';
 const DYNAMO_PRIMARY_KEY = 'id';
 
-//TODO: change from patch to put
-
 class SimpleClassifierStack extends cdk.Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
@@ -37,32 +35,10 @@ class SimpleClassifierStack extends cdk.Stack {
       handler: 'getAll.handler',
     });
 
-    // new lambda.NodejsFunction(this, 'js-handler', {
-    //   entry: path.join(__dirname, 'integ-handlers/js-handler.js'),
-    //   runtime: Runtime.NODEJS_12_X,
-    // });
-
-    // const lambdaCreateOne = new lambda.NodejsFunction(this, 'CreateOne', {
-    //   entry: path.join(__dirname, '../src/createOne.js'),
-    //   runtime: lambda.Runtime.NODEJS_12_X,
-    //   // code: lambda.Code.asset('src/build'),
-    //   // code: new lambda.AssetCode('src'),
-    //   // handler: 'createOne.handler',
-    //   environment: {
-    //     TABLE_NAME: DYNAMO_TABLE_NAME,
-    //     PRIMARY_KEY: DYNAMO_PRIMARY_KEY,
-    //   },
-    // });
-
     const lambdaCreateOne = new lambda.Function(this, 'CreateOne', {
       ...baseLambdaOptions,
       handler: 'createOne.handler',
     });
-
-    // const lambdaGetOne = new lambda.Function(this, 'GetOne', {
-    //   ...baseLambdaOptions,
-    //   handler: 'getOne.handler',
-    // });
 
     const lambdaUpdateOne = new lambda.Function(this, 'UpdateOne', {
       ...baseLambdaOptions,
@@ -74,11 +50,16 @@ class SimpleClassifierStack extends cdk.Stack {
       handler: 'deleteOne.handler',
     });
 
+    const lambdaClassify = new lambda.Function(this, 'Classify', {
+      ...baseLambdaOptions,
+      handler: 'classify.handler',
+    });
+
     dynamoTable.grantReadWriteData(lambdaGetAll);
-    // dynamoTable.grantReadWriteData(lambdaGetOne);
     dynamoTable.grantReadWriteData(lambdaUpdateOne);
     dynamoTable.grantReadWriteData(lambdaCreateOne);
     dynamoTable.grantReadWriteData(lambdaDeleteOne);
+    dynamoTable.grantReadWriteData(lambdaClassify);
 
     const api = new apigateway.RestApi(this, 'SimpleClassifierAPI', {
       restApiName: 'SimpleClassifier API',
@@ -91,16 +72,19 @@ class SimpleClassifierStack extends cdk.Stack {
     labels.addMethod('POST', createOneIntegration);
 
     const label = labels.addResource('{id}');
-    // const getOneIntegration = new apigateway.LambdaIntegration(lambdaGetOne);
-    // label.addMethod('GET', getOneIntegration);
     const deleteOneIntegration = new apigateway.LambdaIntegration(lambdaDeleteOne);
     label.addMethod('DELETE', deleteOneIntegration);
     const updateOneIntegration = new apigateway.LambdaIntegration(lambdaUpdateOne);
-    label.addMethod('PATCH', updateOneIntegration);
+    label.addMethod('PUT', updateOneIntegration);
+
+    const classify = api.root.addResource('classify');
+    const classifyIntegration = new apigateway.LambdaIntegration(lambdaClassify);
+    classify.addMethod('GET', classifyIntegration);
 
     addCorsOptions(api.root);
     addCorsOptions(labels);
     addCorsOptions(label);
+    addCorsOptions(classify);
   }
 }
 

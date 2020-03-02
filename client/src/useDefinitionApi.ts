@@ -79,7 +79,7 @@ export default () => {
   const saveDefinition = async (definition: LabelDefinition) => {
     const { id } = definition;
     await callApi(id, {
-      method: 'PATCH',
+      method: 'PUT',
       mode: 'cors',
       headers: {
         'Content-Type': 'application/json',

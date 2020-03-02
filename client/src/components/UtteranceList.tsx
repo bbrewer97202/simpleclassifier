@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import Button from './Button';
+import TextInput from './TextInput';
 
 type Props = {
   utterances: string[];
@@ -55,18 +57,20 @@ export default ({ utterances, saveHandler }: Props) => {
 
     if (index === editIndex) {
       return (
-        <li key={index}>
-          <input type="text" value={editUtterance} onChange={onEditUtteranceChange} />
-          <button onClick={onEditUtteranceUpdate}>Save</button>
-          <button onClick={onEditUtteranceCancel}>Cancel</button>
+        <li key={index} className="flex items-center justify-between bg-transparent odd:bg-indigo-100">
+          <TextInput id="edited-utterance" value={editUtterance} onChange={onEditUtteranceChange} className="mr-5" />
+          <Button onClick={onEditUtteranceUpdate}>Save</Button>
+          <Button onClick={onEditUtteranceCancel}>Cancel</Button>
         </li>
       );
     } else {
       return (
-        <li key={index}>
+        <li key={index} className="flex items-center justify-between p-2 bg-transparent odd:bg-indigo-100">
           <span>{utterance}</span>
-          <button onClick={onUtteranceEdit}>Edit</button>
-          <button onClick={onUtteranceDelete}>Delete</button>
+          <span className="ml-4">
+            <Button onClick={onUtteranceEdit}>Edit</Button>
+            <Button onClick={onUtteranceDelete}>Delete</Button>
+          </span>
         </li>
       );
     }
@@ -80,11 +84,15 @@ export default ({ utterances, saveHandler }: Props) => {
 
   return (
     <div>
+      <h4 className="mt-6 font-bold">Utterances:</h4>
       <ul>
         {utteranceList}
-        <li>
-          <input type="text" value={newUtterance} onChange={onNewUtteranceChange} />
-          <button onClick={onNewUtteranceAdd}>Add</button>
+        <li className="mt-6">
+          <h4 className="font-bold">Add Utterance:</h4>
+          <div className="flex items-center">
+            <TextInput id="new-utterance" value={newUtterance} onChange={onNewUtteranceChange} className="mr-5" />
+            <Button onClick={onNewUtteranceAdd}>Add</Button>
+          </div>
         </li>
       </ul>
     </div>

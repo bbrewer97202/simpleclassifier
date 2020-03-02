@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import TestClassifier from './components/TestClassifier';
 import DefinitionSelector from './components/DefinitionSelector';
 import DefinitionEditor from './components/DefinitionEditor';
+import Button from './components/Button';
+import Panel from './components/Panel';
 import { LabelDefinition } from './types';
 import { NEW_DEFINITION_ID } from './constants';
 import useDefinitionApi from './useDefinitionApi';
@@ -68,19 +71,26 @@ function App() {
   const style = isLoading ? { opacity: 0.2 } : {};
 
   return (
-    <div style={style}>
-      <DefinitionSelector list={definitionList} selectHandler={onDefinitionSelect} />
-      <div style={{ margin: '30px 0' }}>
-        <button onClick={onCreateDefinition}>Create new definition</button>
-      </div>
-      {activeDefinitionId ? (
-        <DefinitionEditor
-          definition={activeDefinition}
-          saveHandler={onDefinitionSave}
-          deleteHandler={onDefinitionDelete}
-          closeHandler={onDefinitionSelect}
-        />
-      ) : null}
+    <div style={style} className="py-10 m-auto max-w-screen-lg">
+      <Panel title="Test">
+        <TestClassifier />
+      </Panel>
+
+      <Panel title="Train">
+        <DefinitionSelector list={definitionList} selectHandler={onDefinitionSelect} />
+        <div style={{ margin: '30px 0' }}>
+          {activeDefinitionId ? (
+            <DefinitionEditor
+              definition={activeDefinition}
+              saveHandler={onDefinitionSave}
+              deleteHandler={onDefinitionDelete}
+              closeHandler={onDefinitionSelect}
+            />
+          ) : (
+            <Button onClick={onCreateDefinition}>Create new definition</Button>
+          )}
+        </div>
+      </Panel>
     </div>
   );
 }
