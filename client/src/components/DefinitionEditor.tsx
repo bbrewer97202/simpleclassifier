@@ -63,7 +63,11 @@ const DefinitionEditor = ({ closeHandler, deleteHandler, saveHandler, definition
     <div className="mb-8 p-6 bg-gray-100 rounded">
       <h3 className="flex align-center justify-between font-bold text-xl mb-2">
         {title}
-        <button className="bg-transparent py-1 px-2 border-transparent leading-none" onClick={onCloseClick}>
+        <button
+          className="bg-transparent py-1 px-2 border-transparent leading-none"
+          aria-label="Close"
+          onClick={onCloseClick}
+        >
           &times;
         </button>
       </h3>

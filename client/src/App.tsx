@@ -8,6 +8,9 @@ import { LabelDefinition } from './types';
 import { NEW_DEFINITION_ID } from './constants';
 import useDefinitionApi from './useDefinitionApi';
 
+//TODO: completely refactor useDefinitionApi, maybe call it individually
+//TODO: maybe add isNew flag to LabelDefinition so as to prevent new hackiness
+
 function App() {
   const [activeDefinitionId, setActiveDefinitionId] = useState<string | null>(null);
   const {
