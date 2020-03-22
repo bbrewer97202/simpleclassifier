@@ -6,33 +6,26 @@ import Button from './components/Button';
 import Panel from './components/Panel';
 import { LabelDefinition } from './types';
 import { NEW_DEFINITION_ID } from './constants';
-import useDefinitionApi from './useDefinitionApi';
+import useDefinitionApi from './useApi';
 
 //TODO: completely refactor useDefinitionApi, maybe call it individually
 //TODO: maybe add isNew flag to LabelDefinition so as to prevent new hackiness
 
 function App() {
   const [activeDefinitionId, setActiveDefinitionId] = useState<string | null>(null);
-  const {
-    loadAllDefinitions,
-    saveDefinition,
-    deleteDefinition,
-    createDefinition,
-    isLoading, //TODO
-    isError, //TODO
-    allDefinitions: definitionList,
-    apiAffectedDefinition,
-  } = useDefinitionApi();
+  const { api, isLoading, isError, apiResponse } = useDefinitionApi();
+  const { getAllDefinitions, createDefinition, deleteDefinition, saveDefinition } = api;
+  const { definitions, changed } = apiResponse;
 
   const getActiveDefinition = (): LabelDefinition | null => {
     //TODO: if API failure, allDefinitions is null
-    if (!definitionList) return null;
+    if (!definitions) return null;
 
     if (activeDefinitionId === NEW_DEFINITION_ID) {
       return { id: activeDefinitionId, label: '', utterances: [] };
     }
 
-    const definition = definitionList.find(definition => definition.id === activeDefinitionId);
+    const definition = definitions.find(definition => definition.id === activeDefinitionId);
     return definition ? definition : null;
   };
   const activeDefinition = getActiveDefinition();
@@ -44,16 +37,17 @@ function App() {
   const onDefinitionSave = async (definition: LabelDefinition) => {
     if (definition.id === NEW_DEFINITION_ID) {
       delete definition.id;
+      //TODO: remove new definition id and replace with concept of isNew flag, setting here to false
       await createDefinition(definition);
     } else {
       await saveDefinition(definition);
     }
-    await loadAllDefinitions();
+    await getAllDefinitions();
   };
 
   const onDefinitionDelete = async (id: string) => {
     await deleteDefinition(id);
-    await loadAllDefinitions();
+    await getAllDefinitions();
   };
 
   const onCreateDefinition = () => {
@@ -61,17 +55,21 @@ function App() {
   };
 
   useEffect(() => {
-    loadAllDefinitions();
-  }, [loadAllDefinitions]);
+    getAllDefinitions();
+  }, [getAllDefinitions]);
 
   //on DB update ensure open/active state of the affected definition
   useEffect(() => {
-    if (apiAffectedDefinition?.id) {
-      setActiveDefinitionId(apiAffectedDefinition.id);
+    if (changed?.id) {
+      setActiveDefinitionId(changed.id);
     }
-  }, [apiAffectedDefinition]);
+  }, [changed]);
 
   const style = isLoading ? { opacity: 0.2 } : {};
+
+  if (isError) {
+    return <div className="m-auto py-20 text-center">An error occurred communicating with the server.</div>;
+  }
 
   return (
     <div style={style} className="py-10 m-auto max-w-screen-lg">
@@ -80,7 +78,7 @@ function App() {
       </Panel>
 
       <Panel title="Train">
-        <DefinitionSelector list={definitionList} selectHandler={onDefinitionSelect} />
+        <DefinitionSelector list={definitions} selectHandler={onDefinitionSelect} />
         <div style={{ margin: '30px 0' }}>
           {activeDefinitionId ? (
             <DefinitionEditor
