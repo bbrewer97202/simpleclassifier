@@ -1,25 +1,23 @@
 import React from 'react';
 import { cleanup, fireEvent, render, waitForElement } from '@testing-library/react';
 import DefinitionEditor from '../components/DefinitionEditor';
-import { NEW_DEFINITION_ID } from '../constants';
-import useDefinitionApi from '../useDefinitionApi';
-
-// jest.mock('useDefinitionApi');
 
 const onDefinitionSave = jest.fn();
 const onDefinitionDelete = jest.fn();
 const onDefinitionClose = jest.fn();
 
-const definitionNew = { id: NEW_DEFINITION_ID, label: '', utterances: [] };
+const definitionNew = { id: '_new_', label: '', utterances: [] };
+const definitionExisting = { id: 'abc', label: 'existing label', utterances: ['utterance 1', 'utterance 2'] };
 
 afterEach(() => {
   cleanup();
 });
 
 describe('definition editor', () => {
-  it('renders a distinct interface when creating new definitions', () => {
+  it('renders a distinct interface for new definitions', () => {
     const { getByText, queryByLabelText } = render(
       <DefinitionEditor
+        isNew={true}
         definition={definitionNew}
         saveHandler={onDefinitionSave}
         deleteHandler={onDefinitionDelete}
@@ -31,34 +29,32 @@ describe('definition editor', () => {
     expect(queryByLabelText(/Utterances/)).toBeNull();
   });
 
-  // it('adds additional elements after saving the new definition', async () => {
-  //   // useDefinitionApi.
+  it('invokes close handler when close button clicked', () => {
+    const { getByLabelText } = render(
+      <DefinitionEditor
+        isNew={false}
+        definition={definitionNew}
+        saveHandler={onDefinitionSave}
+        deleteHandler={onDefinitionDelete}
+        closeHandler={onDefinitionClose}
+      />
+    );
+    fireEvent.click(getByLabelText('Close'));
+    expect(onDefinitionClose).toHaveBeenCalled();
+  });
 
-  //   const { getByText, queryByLabelText } = render(
-  //     <DefinitionEditor
-  //       definition={definitionNew}
-  //       saveHandler={onDefinitionSave}
-  //       deleteHandler={onDefinitionDelete}
-  //       closeHandler={onDefinitionClose}
-  //     />
-  //   );
-  //   fireEvent.click(getByText('Save'));
-  //   expect(onDefinitionSave).toHaveBeenCalled();
-  //   // await waitForElement(() => {
-  //   //   expect(getByText(/Update/)).toBeTruthy();
-  //   // });
-  // });
-});
+  it('renders existing label name', () => {
+    const { getByLabelText } = render(
+      <DefinitionEditor
+        isNew={false}
+        definition={definitionExisting}
+        saveHandler={onDefinitionSave}
+        deleteHandler={onDefinitionDelete}
+        closeHandler={onDefinitionClose}
+      />
+    );
+    expect(getByLabelText('Label')).toHaveValue('existing label');
+  });
 
-it('invokes close handler when close button clicked', () => {
-  const { getByLabelText } = render(
-    <DefinitionEditor
-      definition={definitionNew}
-      saveHandler={onDefinitionSave}
-      deleteHandler={onDefinitionDelete}
-      closeHandler={onDefinitionClose}
-    />
-  );
-  fireEvent.click(getByLabelText('Close'));
-  expect(onDefinitionClose).toHaveBeenCalled();
+  // it('allows existing label name to be updated', () => {});
 });

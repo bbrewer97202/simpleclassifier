@@ -38,7 +38,6 @@ export default ({ utterances, saveHandler }: Props) => {
     if (isSaveableUtterance(editUtterance)) {
       const newList = [...utterances];
       newList.splice(editIndex, 1, editUtterance);
-      //TODO: what if update failed
       await saveHandler(newList);
     }
     setEditUtterance('');

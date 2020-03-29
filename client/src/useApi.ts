@@ -1,6 +1,10 @@
 import { useCallback, useReducer } from 'react';
 import { LabelDefinition } from './types';
 
+interface Configuration {
+  requestTimeoutMS?: number;
+}
+
 interface ApiState {
   isLoading: boolean;
   isError: boolean;
@@ -41,8 +45,9 @@ const apiReducer = (state: ApiState, action: ApiAction): ApiState => {
   }
 };
 
-export default () => {
+export default (options: Configuration = {}) => {
   const [state, dispatch] = useReducer(apiReducer, defaultState);
+  const { requestTimeoutMS = 6000 } = options;
 
   const callApi = async (path = '', params: RequestInit = {}) => {
     const controller = new AbortController();
@@ -55,9 +60,8 @@ export default () => {
 
     const timeout = setTimeout(() => {
       controller.abort();
-      console.log('request timed out');
       dispatch({ type: 'error', payload: [] });
-    }, 6000);
+    }, requestTimeoutMS);
 
     dispatch({ type: 'loading', payload: [] });
     try {

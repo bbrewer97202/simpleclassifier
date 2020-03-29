@@ -47,18 +47,6 @@ const getTrainingData = async () => {
 const handler = async event => {
   if (!event.queryStringParameters || !event.queryStringParameters.utterance) return { statusCode: 400 };
 
-  // const trainingData = [
-  //   { utterance: 'I want to prepay my loan', label: 'prepay' },
-  //   { utterance: 'I want to close my loan', label: 'prepay' },
-  //   { utterance: 'I want to foreclose my loan', label: 'prepay' },
-  //   { utterance: 'I would like to pay the loan balance', label: 'prepay' },
-  //   { utterance: 'I need loan for car', label: 'autoloan' },
-  //   { utterance: 'I need loan for a new vehicle', label: 'autoloan' },
-  //   { utterance: 'I need loan for a new mobike', label: 'autoloan' },
-  //   { utterance: 'I need money for a new car', label: 'autoloan' },
-  //   { utterance: 'I would like to borrow money to buy a vehicle', label: 'autoloan' },
-  // ];
-
   const trainingData = await getTrainingData();
   console.log('trainingData: ', JSON.stringify(trainingData, null, 2));
 
@@ -72,7 +60,6 @@ const handler = async event => {
   const result = classifier.predict(utterance);
 
   try {
-    // await db.put(params).promise();
     return util.respondSuccess({
       utterance,
       result,

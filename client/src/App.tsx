@@ -4,21 +4,17 @@ import DefinitionSelector from './components/DefinitionSelector';
 import DefinitionEditor from './components/DefinitionEditor';
 import Button from './components/Button';
 import Panel from './components/Panel';
+import useApi from './useApi';
 import { LabelDefinition } from './types';
-import { NEW_DEFINITION_ID } from './constants';
-import useDefinitionApi from './useApi';
-
-//TODO: completely refactor useDefinitionApi, maybe call it individually
-//TODO: maybe add isNew flag to LabelDefinition so as to prevent new hackiness
 
 function App() {
+  const NEW_DEFINITION_ID = '_new_';
   const [activeDefinitionId, setActiveDefinitionId] = useState<string | null>(null);
-  const { api, isLoading, isError, apiResponse } = useDefinitionApi();
+  const { api, isLoading, isError, apiResponse } = useApi();
   const { getAllDefinitions, createDefinition, deleteDefinition, saveDefinition } = api;
   const { definitions, changed } = apiResponse;
 
   const getActiveDefinition = (): LabelDefinition | null => {
-    //TODO: if API failure, allDefinitions is null
     if (!definitions) return null;
 
     if (activeDefinitionId === NEW_DEFINITION_ID) {
@@ -28,7 +24,6 @@ function App() {
     const definition = definitions.find(definition => definition.id === activeDefinitionId);
     return definition ? definition : null;
   };
-  const activeDefinition = getActiveDefinition();
 
   const onDefinitionSelect = (id: string | null = null) => {
     setActiveDefinitionId(id);
@@ -37,7 +32,6 @@ function App() {
   const onDefinitionSave = async (definition: LabelDefinition) => {
     if (definition.id === NEW_DEFINITION_ID) {
       delete definition.id;
-      //TODO: remove new definition id and replace with concept of isNew flag, setting here to false
       await createDefinition(definition);
     } else {
       await saveDefinition(definition);
@@ -54,6 +48,7 @@ function App() {
     onDefinitionSelect(NEW_DEFINITION_ID);
   };
 
+  //load definitions by default
   useEffect(() => {
     getAllDefinitions();
   }, [getAllDefinitions]);
@@ -65,6 +60,7 @@ function App() {
     }
   }, [changed]);
 
+  const activeDefinition = getActiveDefinition();
   const style = isLoading ? { opacity: 0.2 } : {};
 
   if (isError) {
@@ -82,6 +78,7 @@ function App() {
         <div style={{ margin: '30px 0' }}>
           {activeDefinitionId ? (
             <DefinitionEditor
+              isNew={activeDefinitionId === NEW_DEFINITION_ID}
               definition={activeDefinition}
               saveHandler={onDefinitionSave}
               deleteHandler={onDefinitionDelete}

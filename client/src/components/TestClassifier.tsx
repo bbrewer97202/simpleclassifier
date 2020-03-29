@@ -11,17 +11,18 @@ const TestClassifier = () => {
   const onSubmit = async () => {
     if (testValue) {
       setTestResult('');
-      //TODO: move endpoint
-      const ENDPOINT = 'https://lv1yspajz6.execute-api.us-west-2.amazonaws.com/prod/classify';
+      const ENDPOINT = `${process.env.REACT_APP_SERVICE_URL}/prod/classify`;
       const url = `${ENDPOINT}?utterance=${encodeURIComponent(testValue)}`;
-      console.log('url', url);
-      const results = await fetch(url);
-      const json = await results.json();
-      console.log('JSON', json);
-      if (json.success && json.data.result) {
-        setTestResult(json.data.result);
-      } else {
-        setTestResult('An error occurred, please try again later.');
+      try {
+        const results = await fetch(url);
+        const json = await results.json();
+        if (json.success && json.data.result) {
+          setTestResult(json.data.result);
+        } else {
+          setTestResult('An error occurred, please try again.');
+        }
+      } catch (e) {
+        setTestResult('An error occurred, please try again.');
       }
     }
   };

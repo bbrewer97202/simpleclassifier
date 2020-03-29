@@ -1,26 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { LabelDefinition } from '../types';
-import { NEW_DEFINITION_ID } from '../constants';
 import UtteranceList from './UtteranceList';
 import Button from './Button';
 import TextInput from './TextInput';
 import InputLabel from './InputLabel';
 import useKeyDown from '../useKeyDown';
 
-//TODO: closeHandler is wrong
-
 type Props = {
+  isNew: boolean;
   definition: LabelDefinition | null;
   closeHandler(label?: string): void;
   deleteHandler(id: string): void;
   saveHandler(definition: LabelDefinition): void;
 };
 
-const DefinitionEditor = ({ closeHandler, deleteHandler, saveHandler, definition }: Props) => {
+const DefinitionEditor = ({ isNew, closeHandler, deleteHandler, saveHandler, definition }: Props) => {
   const [newLabel, setNewLabel] = useState<string>('');
   const { id = '', label = '', utterances = [] } = definition || {};
-  const isNewDefinition = id === NEW_DEFINITION_ID;
-  const title = isNewDefinition ? 'New Definition' : `Edit Definition: "${label}"`;
+  const title = isNew ? 'New Definition' : `Edit Definition: "${label}"`;
 
   const saveUpdate = async (updates = {}) => {
     const newDefinition = {
@@ -76,10 +73,10 @@ const DefinitionEditor = ({ closeHandler, deleteHandler, saveHandler, definition
           <InputLabel forInput="label-update-input">Label</InputLabel>
           <div className="flex items-center">
             <TextInput id="label-update-input" value={newLabel} onChange={onLabelChange} className="mr-5" />
-            <Button onClick={onLabelSave}>{isNewDefinition ? 'Save' : 'Update'}</Button>
+            <Button onClick={onLabelSave}>{isNew ? 'Save' : 'Update'}</Button>
           </div>
         </div>
-        {!isNewDefinition ? (
+        {!isNew ? (
           <>
             <UtteranceList utterances={utterances} saveHandler={saveUtteranceChanges} />
             <div className="flex justify-end mt-10 mb-5">
