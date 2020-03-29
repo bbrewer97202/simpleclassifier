@@ -4,17 +4,19 @@ Manage text intent classifications and natural language training utterances.
 
 ## Overview
 
-Client/server app to manage training data using the [Wink Naive Bayes Classifier](https://winkjs.org/wink-naive-bayes-text-classifier/). Server hosted on AWS, managed by AWS SDK, built with Node.js. Client built React TypeScript and Tailwind.css.
+Client/server app to manage training data using the [Wink Naive Bayes Classifier](https://winkjs.org/wink-naive-bayes-text-classifier/). Server hosted on AWS, managed by AWS CDK, built with Node.js. Client built with TypeScript, React and Tailwind.css.
 
 ![App screenshot Training](client/screenshots/train_definition.png)
+_Add training definitions and example utterances_
 
 ![App screenshot Testing](client/screenshots/test_definition.png)
+_Test classification with utterance_
 
 ## Server
 
 Requires an AWS account with [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html) installed.
 
-If you use an [AWS Profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html), update [package.json](server/package.json#L9) with your profile id.
+If you use an [AWS Profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html), update [package.json](server/package.json#L8) with your profile id.
 
 If using a profile, you may need to bootstrap CDK:
 
