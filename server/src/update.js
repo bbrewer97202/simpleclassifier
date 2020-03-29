@@ -2,14 +2,19 @@ const AWS = require('aws-sdk');
 const util = require('./util.js');
 const db = new AWS.DynamoDB.DocumentClient();
 
+/**
+ * lambda http event handler
+ * update a database entry with the passed content
+ * @param {Object} event
+ */
 exports.handler = async event => {
-  if (!event.body) return { statusCode: 400 };
+  if (!event.body) return util.respondFailure();
 
   const item = typeof event.body == 'object' ? event.body : JSON.parse(event.body);
   const id = event.pathParameters.id;
   const { id: labelId, label, utterances = [] } = item;
 
-  if (!id || !(labelId || label) || id !== labelId) return { statusCode: 400 };
+  if (!id || !(labelId || label) || id !== labelId) return util.respondFailure();
 
   const params = {
     TableName: process.env.TABLE_NAME,
@@ -33,6 +38,6 @@ exports.handler = async event => {
     });
   } catch (error) {
     console.log('update error', error);
-    return { statusCode: 500 };
+    return util.respondFailure();
   }
 };

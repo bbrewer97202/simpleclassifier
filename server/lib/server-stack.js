@@ -35,19 +35,19 @@ class SimpleClassifierStack extends cdk.Stack {
       handler: 'getAll.handler',
     });
 
-    const lambdaCreateOne = new lambda.Function(this, 'CreateOne', {
+    const lambdaCreate = new lambda.Function(this, 'Create', {
       ...baseLambdaOptions,
-      handler: 'createOne.handler',
+      handler: 'create.handler',
     });
 
-    const lambdaUpdateOne = new lambda.Function(this, 'UpdateOne', {
+    const lambdaUpdate = new lambda.Function(this, 'Update', {
       ...baseLambdaOptions,
-      handler: 'updateOne.handler',
+      handler: 'update.handler',
     });
 
-    const lambdaDeleteOne = new lambda.Function(this, 'DeleteOne', {
+    const lambdaDelete = new lambda.Function(this, 'Delete', {
       ...baseLambdaOptions,
-      handler: 'deleteOne.handler',
+      handler: 'delete.handler',
     });
 
     const lambdaClassify = new lambda.Function(this, 'Classify', {
@@ -56,9 +56,9 @@ class SimpleClassifierStack extends cdk.Stack {
     });
 
     dynamoTable.grantReadWriteData(lambdaGetAll);
-    dynamoTable.grantReadWriteData(lambdaUpdateOne);
-    dynamoTable.grantReadWriteData(lambdaCreateOne);
-    dynamoTable.grantReadWriteData(lambdaDeleteOne);
+    dynamoTable.grantReadWriteData(lambdaUpdate);
+    dynamoTable.grantReadWriteData(lambdaCreate);
+    dynamoTable.grantReadWriteData(lambdaDelete);
     dynamoTable.grantReadWriteData(lambdaClassify);
 
     const api = new apigateway.RestApi(this, 'SimpleClassifierAPI', {
@@ -68,14 +68,14 @@ class SimpleClassifierStack extends cdk.Stack {
     const labels = api.root.addResource('labels');
     const getAllIntegration = new apigateway.LambdaIntegration(lambdaGetAll);
     labels.addMethod('GET', getAllIntegration);
-    const createOneIntegration = new apigateway.LambdaIntegration(lambdaCreateOne);
-    labels.addMethod('POST', createOneIntegration);
+    const createIntegration = new apigateway.LambdaIntegration(lambdaCreate);
+    labels.addMethod('POST', createIntegration);
 
     const label = labels.addResource('{id}');
-    const deleteOneIntegration = new apigateway.LambdaIntegration(lambdaDeleteOne);
-    label.addMethod('DELETE', deleteOneIntegration);
-    const updateOneIntegration = new apigateway.LambdaIntegration(lambdaUpdateOne);
-    label.addMethod('PUT', updateOneIntegration);
+    const deleteIntegration = new apigateway.LambdaIntegration(lambdaDelete);
+    label.addMethod('DELETE', deleteIntegration);
+    const updateIntegration = new apigateway.LambdaIntegration(lambdaUpdate);
+    label.addMethod('PUT', updateIntegration);
 
     const classify = api.root.addResource('classify');
     const classifyIntegration = new apigateway.LambdaIntegration(lambdaClassify);

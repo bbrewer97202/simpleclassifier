@@ -52,6 +52,8 @@ Run tests:
 
     npm run test
 
+Please define at least two definitions and a handful of utterances for each before testing classifier.
+
 ## TODO
 
 - API authentication

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import TestClassifier from './components/TestClassifier';
 import DefinitionSelector from './components/DefinitionSelector';
 import DefinitionEditor from './components/DefinitionEditor';
@@ -9,6 +9,7 @@ import { LabelDefinition } from './types';
 
 function App() {
   const NEW_DEFINITION_ID = '_new_';
+  const refInitialized = useRef(false);
   const [activeDefinitionId, setActiveDefinitionId] = useState<string | null>(null);
   const { api, isLoading, isError, apiResponse } = useApi();
   const { getAllDefinitions, createDefinition, deleteDefinition, saveDefinition } = api;
@@ -50,7 +51,10 @@ function App() {
 
   //load definitions by default
   useEffect(() => {
-    getAllDefinitions();
+    if (!refInitialized.current) {
+      refInitialized.current = true;
+      getAllDefinitions();
+    }
   }, [getAllDefinitions]);
 
   //on DB update ensure open/active state of the affected definition

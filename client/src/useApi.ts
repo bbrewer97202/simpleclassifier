@@ -1,4 +1,4 @@
-import { useCallback, useReducer } from 'react';
+import { useReducer } from 'react';
 import { LabelDefinition } from './types';
 
 interface Configuration {
@@ -86,9 +86,9 @@ export default (options: Configuration = {}) => {
   };
 
   const api = {
-    getAllDefinitions: useCallback(async () => {
+    getAllDefinitions: async () => {
       await callApi();
-    }, []),
+    },
 
     saveDefinition: async (definition: LabelDefinition) => {
       const { id } = definition;
